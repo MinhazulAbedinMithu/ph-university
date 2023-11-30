@@ -113,7 +113,7 @@ const studentSchema = new Schema<TStudent, IStudentModel>(
     localGuardian: {
       type: localGuardianSchema,
     },
-    profileImage: { type: String },
+    profileImg: { type: String },
   },
   {
     toJSON: {

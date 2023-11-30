@@ -1,42 +1,31 @@
 import { TStudent } from './../student/student.interface';
-import { NextFunction, Request, Response } from 'express';
-import { TUser } from './user.interface';
-import { userValidation } from './user.validation';
 import { userServices } from './user.service';
 import httpStatus from 'http-status';
 import sendResponse from '../../utils/sendResponse';
+import catchAsync from '../../utils/catchAsync';
 
 //Create Student
-const createStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const {
-      password,
-      student,
-    }: { password: string; student: Partial<TStudent> } = req.body;
-    // const parsedPassword = userValidation.userValidationSchema.parse(password);
+const createStudent = catchAsync(async (req, res) => {
+  const {
+    password,
+    student,
+  }: { password: string; student: Partial<TStudent> } = req.body;
 
-    const result = await userServices.createStudent(password, student);
+  const result = await userServices.createStudent(password, student);
 
-    if (!result) {
-      sendResponse(res, {
-        statusCode: httpStatus.NO_CONTENT,
-        success: false,
-        message: 'Something went wrong!!!',
-        data: result,
-      });
-    }
+  if (!result) {
     sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Student Created Successfully',
+      statusCode: httpStatus.NO_CONTENT,
+      success: false,
+      message: 'Something went wrong!!!',
       data: result,
     });
-  } catch (error: any) {
-    next(error);
   }
-};
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Student Created Successfully',
+    data: result,
+  });
+});
 export const userControllers = { createStudent };

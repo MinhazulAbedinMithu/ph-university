@@ -22,9 +22,10 @@ export type TLocalGuardian = {
 export type TStudent = {
   id: string;
   user: Types.ObjectId;
+  password: string;
   name: TUserName;
-  gender: 'male' | 'female';
-  dateOfBirth: string;
+  gender: 'male' | 'female' | 'other';
+  dateOfBirth?: Date;
   email: string;
   contactNo: string;
   emergencyContactNo: string;
@@ -33,7 +34,8 @@ export type TStudent = {
   permanentAddress: string;
   guardian: TGuardian;
   localGuardian: TLocalGuardian;
-  profileImage?: string;
+  profileImg?: string;
+  admissionSemester: Types.ObjectId;
 };
 
 // export type TStudentMethods = {

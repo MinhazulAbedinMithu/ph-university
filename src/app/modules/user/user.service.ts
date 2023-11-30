@@ -20,7 +20,7 @@ const createStudent = async (
     : (config.student_default_pass as string);
 
   // set student Id
-  userData.id = '173002005';
+  userData.id = '173002006';
 
   userData.role = 'student';
 
@@ -29,11 +29,9 @@ const createStudent = async (
 
   if (Object.keys(newUser).length) {
     // set student id, user id
-    console.log(newUser);
 
     studentData.id = newUser.id;
     studentData.user = newUser._id;
-    console.log({ studentData });
     const newStudent = await StudentModel.create(studentData);
 
     return newStudent;
