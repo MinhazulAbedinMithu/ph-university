@@ -81,11 +81,16 @@ const studentSchema = new Schema<TStudent, IStudentModel>(
         message: '{VALUE} is not a valid gender',
       },
     },
+
     dateOfBirth: {
       type: String,
       required: [true, 'Date of birth is required'],
     },
-    email: { type: String, required: [true, 'Email is required'] },
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      unique: true,
+    },
     contactNo: { type: String, required: [true, 'Contact number is required'] },
     emergencyContactNo: {
       type: String,
@@ -114,6 +119,11 @@ const studentSchema = new Schema<TStudent, IStudentModel>(
       type: localGuardianSchema,
     },
     profileImg: { type: String },
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'AcademicSemester',
+    },
   },
   {
     toJSON: {
