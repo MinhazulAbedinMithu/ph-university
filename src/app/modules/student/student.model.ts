@@ -124,6 +124,15 @@ const studentSchema = new Schema<TStudent, IStudentModel>(
       required: true,
       ref: 'AcademicSemester',
     },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'AcademicDepartment',
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: {
@@ -133,15 +142,15 @@ const studentSchema = new Schema<TStudent, IStudentModel>(
 );
 
 //Create a custom static method
-// studentSchema.statics.isStudentExist = async function (id: string) {
-//   const existingUser = await StudentModel.findOne({ id });
-//   return existingUser;
-// };
+studentSchema.statics.isStudentExist = async function (id: string) {
+  const existingUser = await StudentModel.findOne({ id });
+  return existingUser;
+};
 
 // Create a custom instance method
 // studentSchema.methods.isStudentExist = async function (id: string) {
 //   const existingUser = await StudentModel.findOne({ id });
-//   return existingUser;
+//   return existingUser || null;
 // };
 
 // Query middleware
