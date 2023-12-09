@@ -1,19 +1,49 @@
-import { NextFunction, Request, Response } from 'express';
+import { ErrorRequestHandler } from 'express';
+import { ZodError } from 'zod';
+import { TErrorSourses } from '../interface/error.interface';
+import config from '../config';
+import handleZodError from '../errors/handleZodError';
+import handleValidationError from '../errors/handleValidationError';
+import handleCastError from '../errors/handleCastError';
+import handleDuplicateError from '../errors/handleDuplicateError';
 
-const globalErrorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const defaultError = {
-    statusCode: err.statusCode || 500,
-    message: err.message || 'Something went wrong!!!',
-  };
-  return res.status(defaultError.statusCode).json({
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  let statusCode = err.statusCode || 500;
+  let message = err.message || 'Something went wrong!!!';
+  let errorSourses: TErrorSourses = [
+    {
+      path: '',
+      message: 'Something went wrong!',
+    },
+  ];
+
+  if (err instanceof ZodError) {
+    const simplifiedError = handleZodError(err);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSourses = simplifiedError.errorSourses;
+  } else if (err?.name === 'ValidationError') {
+    const simplifiedError = handleValidationError(err);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSourses = simplifiedError.errorSourses;
+  } else if (err?.name === 'CastError') {
+    const simplifiedError = handleCastError(err);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSourses = simplifiedError.errorSourses;
+  } else if (err?.code === 11000) {
+    const simplifiedError = handleDuplicateError(err);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSourses = simplifiedError.errorSourses;
+  }
+  return res.status(statusCode).json({
     success: false,
-    message: defaultError.message,
-    error: err,
+    message: message,
+    errorSourses,
+    err,
+    stack: config.NODE_ENV === 'development' ? err?.stack : null,
   });
 };
 
