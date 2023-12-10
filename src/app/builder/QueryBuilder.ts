@@ -40,9 +40,10 @@ class QueryBuilder<T> {
 
   // Sorting
   sort() {
-    let sort = this.query?.sort || '-createdAt';
+    let sort =
+      (this.query?.sort as string)?.split(',')?.join(' ') || '-createdAt';
 
-    this.modelQuery = this.modelQuery.sort(sort as FilterQuery<T>);
+    this.modelQuery = this.modelQuery.sort(sort);
     return this;
   }
   paginate() {
