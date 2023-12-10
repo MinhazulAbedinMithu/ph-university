@@ -1,17 +1,17 @@
 import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
 import { UserModel } from './user.model';
 
-const findLastStudentId = async () => {
-  const lastStudent = await UserModel.findOne(
+const findLastUserId = async (role: string) => {
+  const lastUser = await UserModel.findOne(
     {
-      role: 'student',
+      role: role,
     },
     { id: 1, _id: 0 },
   )
     .sort({ createdAt: -1 })
     .lean();
   // return lastStudent?.id ? lastStudent.id.substring(6) : undefined;
-  return lastStudent?.id ? lastStudent.id : undefined;
+  return lastUser?.id ? lastUser.id : undefined;
 };
 
 export const generateStudentId = async (
@@ -19,7 +19,7 @@ export const generateStudentId = async (
 ) => {
   //first time
   let currentId = (0).toString();
-  const lastStudentId = await findLastStudentId();
+  const lastStudentId = await findLastUserId('student');
   const lastStudentYear = lastStudentId?.substring(0, 4);
   const lastStudentSemesterCode = lastStudentId?.substring(4, 6);
   if (
@@ -31,6 +31,19 @@ export const generateStudentId = async (
   }
   let incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
   incrementId = `${admissionSemester.year}${admissionSemester.code}${incrementId}`;
+
+  return incrementId;
+};
+
+export const generateId = async (type: string) => {
+  //first time
+  let currentId = (0).toString();
+  const lastUserId = await findLastUserId(type);
+  if (lastUserId) {
+    currentId = lastUserId.substring(2);
+  }
+  let incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
+  incrementId = `${type.substring(0, 1).toUpperCase()}-${incrementId}`;
 
   return incrementId;
 };

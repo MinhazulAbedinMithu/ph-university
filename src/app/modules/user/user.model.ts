@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 import { TUser } from './user.interface';
 import config from '../../config';
 import bcrypt from 'bcrypt';
+import AppError from '../../errors/AppError';
 
 const userSchema = new Schema<TUser>(
   {
@@ -42,7 +43,12 @@ userSchema.pre('save', async function (next) {
   );
   next();
 });
-userSchema.post('save', function (doc, next) {
+userSchema.post('save', async function (doc, next) {
+  // console.log({ doc });
+  const existingUser = await UserModel.findOne({ id: doc?.id });
+  if (existingUser) {
+    throw new AppError(400, `${doc.role} Allready Exist !!!`);
+  }
   doc.password = 'hidden';
 
   next();
