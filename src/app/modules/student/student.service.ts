@@ -5,15 +5,75 @@ import httpStatus from 'http-status';
 import { UserModel } from '../user/user.model';
 import { TStudent } from './student.interface';
 
-const getAllStudents = async () => {
-  const result = await StudentModel.find()
+const getAllStudents = async (query: Record<string, unknown>) => {
+  const searchTerm = (query?.searchTerm || '') as string;
+  const queryObj = { ...query };
+
+  //Searching
+  const searchFields = [
+    'email',
+    'id',
+    'name.firstName',
+    'name.lastName',
+    'presentAddress',
+    'bloodGroup',
+  ];
+  //{email: {$regex: query.searchTerm, $options: i}}
+  const searchQuery = StudentModel.find({
+    $or: searchFields.map((field) => {
+      return {
+        [field]: { $regex: searchTerm, $options: 'i' },
+      };
+    }),
+  });
+
+  // Filtering
+  const filterExcludedFields = [
+    'searchTerm',
+    'sort',
+    'limit',
+    'page',
+    'fields',
+  ];
+  filterExcludedFields.forEach((el) => delete queryObj[el]);
+  const filterQuery = searchQuery
+    .find(queryObj)
     .populate('user')
     .populate('admissionSemester')
     .populate({
       path: 'academicDepartment',
       populate: 'academicFaculty',
     });
-  return result;
+
+  // Sorting
+  let sortField = '-createdAt';
+  if (query.sort) {
+    sortField = query.sort as string;
+  }
+  const sortQuery = filterQuery.sort(sortField);
+
+  // Pagination
+  let limit: number = 1;
+  let page: number = 1;
+  let skip: number = 0;
+
+  if (query.limit) {
+    limit = Number(query.limit);
+  }
+  if (query.page) {
+    page = Number(query.page);
+    skip = (page - 1) * limit;
+  }
+  const paginationQuery = sortQuery.skip(skip);
+  const limitQuery = paginationQuery.limit(limit);
+
+  // Field Limiting
+  let fields = '__v';
+  if (query.fields) {
+    fields = (query.fields as string).split(',').join(' ');
+  }
+  const fieldLimitQuery = await limitQuery.select(fields);
+  return fieldLimitQuery;
 };
 const getStudentById = async (id: string) => {
   const result = await StudentModel.findOne({ id });
