@@ -19,7 +19,7 @@ const getAllStudents = async (query: Record<string, unknown>) => {
   return result;
 };
 const getStudentById = async (id: string) => {
-  const result = await StudentModel.findOne({ id });
+  const result = await StudentModel.findById(id);
   // const result = await StudentModel.aggregate([{ $match: { id: id } }]);
   if (!result) {
     throw new AppError(400, 'Student Doest not exist !!!');
@@ -52,7 +52,7 @@ const updateStudentById = async (id: string, payload: Partial<TStudent>) => {
       modifiedData[`guardian.${key}`] = value;
     }
   }
-  const result = await StudentModel.findOneAndUpdate({ id }, modifiedData, {
+  const result = await StudentModel.findByIdAndUpdate(id, modifiedData, {
     new: true,
     runValidators: true,
   });
@@ -70,8 +70,8 @@ const deleteStudentById = async (id: string) => {
   try {
     session.startTransaction();
     // transaction-1 : delete student
-    const deletedStudent = await StudentModel.findOneAndUpdate(
-      { id },
+    const deletedStudent = await StudentModel.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );
@@ -84,8 +84,8 @@ const deleteStudentById = async (id: string) => {
     }
 
     //transaction-2 : delete user
-    const deletedUser = await UserModel.findOneAndUpdate(
-      { id },
+    const deletedUser = await UserModel.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );

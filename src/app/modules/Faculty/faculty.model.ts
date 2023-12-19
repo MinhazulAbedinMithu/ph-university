@@ -103,7 +103,7 @@ const facultySchema = new Schema<TFaculty, IFacultyModel>(
 
 //Create a custom static method
 facultySchema.statics.isFacultyExist = async function (id: string) {
-  const existingUser = await FacultyModel.findOne({ id });
+  const existingUser = await FacultyModel.findById(id);
   return existingUser;
 };
 

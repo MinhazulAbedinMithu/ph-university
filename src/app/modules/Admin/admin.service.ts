@@ -19,7 +19,7 @@ const getAllAdmins = async (query: Record<string, unknown>) => {
   return result;
 };
 const getAdminById = async (id: string) => {
-  const result = await AdminModel.findOne({ id });
+  const result = await AdminModel.findById(id);
   if (!result) {
     throw new AppError(400, 'Admin Doest not exist !!!');
   }
@@ -41,7 +41,7 @@ const updateAdminById = async (id: string, payload: Partial<TAdmin>) => {
       modifiedData[`name.${key}`] = value;
     }
   }
-  const result = await AdminModel.findOneAndUpdate({ id }, modifiedData, {
+  const result = await AdminModel.findByIdAndUpdate(id, modifiedData, {
     new: true,
     runValidators: true,
   });
@@ -59,8 +59,8 @@ const deleteAdminById = async (id: string) => {
   try {
     session.startTransaction();
     // transaction-1 : delete student
-    const deletedAdmin = await AdminModel.findOneAndUpdate(
-      { id },
+    const deletedAdmin = await AdminModel.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );
@@ -70,8 +70,8 @@ const deleteAdminById = async (id: string) => {
     }
 
     //transaction-2 : delete user
-    const deletedUser = await UserModel.findOneAndUpdate(
-      { id },
+    const deletedUser = await UserModel.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );

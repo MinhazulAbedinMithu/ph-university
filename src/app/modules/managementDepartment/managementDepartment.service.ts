@@ -1,4 +1,4 @@
-import { TAcademicDepartment } from './managementDepartment.interface';
+import { TAcademicDepartment } from '../academicDepartment/academicDepartment.interface';
 import { AcademicDepartmentModel } from './managementDepartment.model';
 
 const createAcademicDepartment = async (payload: TAcademicDepartment) => {

@@ -1,5 +1,4 @@
-import { Model, Schema, model } from 'mongoose';
-import config from '../../config';
+import { Schema, model } from 'mongoose';
 import { IAdminModel, TAdmin, TUserName } from './admin.interface';
 
 const adminNameSchema = new Schema<TUserName>({
@@ -99,7 +98,7 @@ const adminSchema = new Schema<TAdmin, IAdminModel>(
 
 //Create a custom static method
 adminSchema.statics.isAdminExist = async function (id: string) {
-  const existingUser = await AdminModel.findOne({ id });
+  const existingUser = await AdminModel.findById(id);
   return existingUser;
 };
 

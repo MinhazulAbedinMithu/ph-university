@@ -19,7 +19,7 @@ const getAllFaculties = async (query: Record<string, unknown>) => {
   return result;
 };
 const getFacultyById = async (id: string) => {
-  const result = await FacultyModel.findOne({ id });
+  const result = await FacultyModel.findById(id);
   if (!result) {
     throw new AppError(400, 'Faculty Doest not exist !!!');
   }
@@ -41,7 +41,7 @@ const updateFacultyById = async (id: string, payload: Partial<TFaculty>) => {
       modifiedData[`name.${key}`] = value;
     }
   }
-  const result = await FacultyModel.findOneAndUpdate({ id }, modifiedData, {
+  const result = await FacultyModel.findByIdAndUpdate(id, modifiedData, {
     new: true,
     runValidators: true,
   });
@@ -59,8 +59,8 @@ const deleteFacultyById = async (id: string) => {
   try {
     session.startTransaction();
     // transaction-1 : delete student
-    const deletedFaculty = await FacultyModel.findOneAndUpdate(
-      { id },
+    const deletedFaculty = await FacultyModel.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );
@@ -73,8 +73,8 @@ const deleteFacultyById = async (id: string) => {
     }
 
     //transaction-2 : delete user
-    const deletedUser = await UserModel.findOneAndUpdate(
-      { id },
+    const deletedUser = await UserModel.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );
